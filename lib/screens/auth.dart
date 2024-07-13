@@ -1,3 +1,5 @@
+import 'dart:isolate';
+
 import 'package:flutter/material.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -10,6 +12,8 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
+
+  var _isLogin = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,7 +63,25 @@ class _AuthScreenState extends State<AuthScreen> {
                                 const InputDecoration(labelText: 'Password'),
                             obscureText: true,
                           ),
-                        ],
+                          const SizedBox(height: 12),
+                          ElevatedButton(
+                            onPressed: () {}, 
+                            child: Text(_isLogin ? 'Sign in' : 'Sign up'),
+                          ),
+                          Container(
+                            margin: const EdgeInsets.only(top: 10),
+                            child: TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  _isLogin = !_isLogin;
+                                });
+                              },
+                              child: Text(_isLogin
+                                  ? 'Create an account'
+                                  : 'I already have an account!'),
+                            ),
+                          ),
+                        ]
                       ),
                     ),
                   ),
