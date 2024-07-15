@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'auth.dart';
+import 'edit.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -34,6 +35,22 @@ class _HomeScreenState extends State<HomeScreen> {
   void _logout() {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (context) => const AuthScreen()),
+    );
+  }
+
+  void _editTask(Map<String, dynamic> task, int index) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => EditTaskScreen(
+          task: task,
+          taskIndex: index,
+          onSave: (updatedTask, taskIndex) {
+            setState(() {
+              _tasks[taskIndex] = updatedTask;
+            });
+          },
+        ),
+      ),
     );
   }
 
@@ -95,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             IconButton(
                               icon: const Icon(Icons.edit),
                               onPressed: () {
-                                // Handle edit task
+                                _editTask(task, index);
                               },
                             ),
                             IconButton(
@@ -176,10 +193,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     ),
                     TextFormField(
-                      decoration: const InputDecoration(labelText: 'Due Date'),
+                      decoration: const InputDecoration(
+                          labelText: 'Due Date (yyyy/mm/dd)'),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter a due date';
+                        }
+                        if (!RegExp(r'^\d{4}/\d{2}/\d{2}$').hasMatch(value)) {
+                          return 'Please enter a valid date (yyyy/mm/dd)';
                         }
                         return null;
                       },
