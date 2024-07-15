@@ -1,6 +1,5 @@
-import 'dart:isolate';
-
 import 'package:flutter/material.dart';
+import 'package:task_manager/screens/home.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -18,12 +17,14 @@ class _AuthScreenState extends State<AuthScreen> {
   var _password = '';
 
   void _submit() {
-    final isValid = _form.currentState!.validate();
+    // final isValid = _form.currentState!.validate();
+    const isValid = true;
 
     if (isValid) {
       _form.currentState!.save();
-      print(_email);
-      print(_password);
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
     }
   }
   @override
