@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'edit.dart';
 import 'profile.dart';
+import 'reminder.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -139,6 +140,14 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void _showReminderSetup(BuildContext context, String taskTitle) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ReminderSetupScreen(taskTitle: taskTitle),
+      ),
+    );
+  }
+
   void _showAddTaskDialog(BuildContext context) {
     final _formKey = GlobalKey<FormState>();
     String title = '';
@@ -201,17 +210,37 @@ class _HomeScreenState extends State<HomeScreen> {
                           dueDate = value!;
                         },
                       ),
+                      const SizedBox(height: 20),
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Checkbox(
-                            value: isPriority,
-                            onChanged: (value) {
-                              setState(() {
-                                isPriority = value!;
-                              });
-                            },
+                          Row(
+                            children: [
+                              Checkbox(
+                                value: isPriority,
+                                onChanged: (value) {
+                                  setState(() {
+                                    isPriority = value!;
+                                  });
+                                },
+                              ),
+                              const Text(
+                                'Set as Priority',
+                                style: TextStyle(fontSize: 16),
+                                ),
+                            ],
                           ),
-                          const Text('Set as Priority'),
+                          TextButton(
+                            onPressed: () {
+                              if (_formKey.currentState!.validate()) {
+                                _showReminderSetup(context, title);
+                              }
+                            },
+                            child: const Text(
+                              'Set a reminder',
+                              style: TextStyle(fontSize: 16, decoration: TextDecoration.underline, decorationColor: Colors.blue,),
+                              ),
+                          ),
                         ],
                       ),
                     ],
