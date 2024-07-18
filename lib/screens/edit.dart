@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 class EditTaskScreen extends StatefulWidget {
-  final Map<String, dynamic> task;
-  final int taskIndex;
-  final Function(Map<String, dynamic>, int) onSave;
+  final Map<String, dynamic> taskData;
+  final String taskId;
+  final Function(Map<String, dynamic>, String) onSave;
 
   const EditTaskScreen({
     Key? key,
-    required this.task,
-    required this.taskIndex,
+    required this.taskData,
+    required this.taskId,
     required this.onSave,
   }) : super(key: key);
 
@@ -26,10 +26,10 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
   @override
   void initState() {
     super.initState();
-    title = widget.task['title'];
-    description = widget.task['description'];
-    dueDate = widget.task['dueDate'];
-    isPriority = widget.task['priority'];
+    title = widget.taskData['title'];
+    description = widget.taskData['description'];
+    dueDate = widget.taskData['dueDate'];
+    isPriority = widget.taskData['priority'];
   }
 
   @override
@@ -97,23 +97,38 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                 },
               ),
               const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    _formKey.currentState!.save();
-                    widget.onSave(
-                      {
-                        'title': title,
-                        'description': description,
-                        'dueDate': dueDate,
-                        'priority': isPriority,
-                      },
-                      widget.taskIndex,
-                    );
-                    Navigator.of(context).pop();
-                  }
-                },
-                child: const Text('Save'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        _formKey.currentState!.save();
+                        widget.onSave(
+                          {
+                            'title': title,
+                            'description': description,
+                            'dueDate': dueDate,
+                            'priority': isPriority,
+                          },
+                          widget.taskId,
+                        );
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    child: const Text('Save'),
+                  ),
+                  const SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey,
+                    ),
+                    child: const Text('Cancel', style: TextStyle(color: Colors.white)),
+                  ),
+                ],
               ),
             ],
           ),

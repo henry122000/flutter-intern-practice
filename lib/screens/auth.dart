@@ -21,31 +21,22 @@ class _AuthScreenState extends State<AuthScreen> {
 
   void _submit() async {
     final isValid = _form.currentState!.validate();
-
     if (!isValid) {
       return;
     }
-
     _form.currentState!.save();
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => const HomeScreen()),
-    );
-
-    if (_isLogin) {
-    } else {
-      try {
-        final userCredentials = await _firebase.createUserWithEmailAndPassword(
-            email: _email, password: _password);
-        print(userCredentials);
-      } on FirebaseAuthException catch (error) {
-        if (error.code == 'email-already-in-use') {}
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(error.message ?? 'Authentication failed'),
-          ),
-        );
+    try {
+      if (_isLogin) {
+        await _firebase.signInWithEmailAndPassword(email: _email, password: _password);
+      } else {
+        await _firebase.createUserWithEmailAndPassword(email: _email, password: _password);
       }
+    } on FirebaseAuthException catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error.message ?? 'Authentication failed'),
+        ),
+      );
     }
   }
 
