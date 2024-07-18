@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'edit.dart';
+import 'profile.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -43,8 +44,10 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('Task Manager'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: _logout,
+            icon: const Icon(Icons.account_circle),
+            onPressed: () async {
+              ProfileDialog.showProfileDialog(context, _firebaseAuth);
+            },
           ),
         ],
       ),
@@ -57,8 +60,8 @@ class _HomeScreenState extends State<HomeScreen> {
           final tasks = snapshot.data!.docs;
           return Center(
             child: Container(
-              margin: const EdgeInsets.all(16.0),
-              padding: const EdgeInsets.all(16.0),
+              margin: const EdgeInsets.all(5.0),
+              padding: const EdgeInsets.all(5.0),
               decoration: const BoxDecoration(color: Colors.transparent),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -83,38 +86,41 @@ class _HomeScreenState extends State<HomeScreen> {
                             itemCount: tasks.length,
                             itemBuilder: (context, index) {
                               var task = tasks[index];
-                              return Card(
-                                margin:
-                                    const EdgeInsets.symmetric(vertical: 8.0),
-                                child: ListTile(
-                                  leading: task['priority']
-                                      ? const Icon(Icons.star,
-                                          color: Colors.amber)
-                                      : null,
-                                  title: Text(task['title']),
-                                  subtitle: Text(task['description']),
-                                  trailing: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      IconButton(
-                                        icon: const Icon(Icons.edit),
-                                        onPressed: () {
-                                          _editTask(task);
-                                        },
+                              return SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.9,
+                                  child: Card(
+                                    margin: const EdgeInsets.symmetric(
+                                        vertical: 8.0),
+                                    child: ListTile(
+                                      leading: task['priority']
+                                          ? const Icon(Icons.star,
+                                              color: Colors.amber)
+                                          : null,
+                                      title: Text(task['title']),
+                                      subtitle: Text(task['description']),
+                                      trailing: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          IconButton(
+                                            icon: const Icon(Icons.edit),
+                                            onPressed: () {
+                                              _editTask(task);
+                                            },
+                                          ),
+                                          IconButton(
+                                            icon: const Icon(Icons.delete),
+                                            onPressed: () {
+                                              _firestore
+                                                  .collection('tasks')
+                                                  .doc(task.id)
+                                                  .delete();
+                                            },
+                                          ),
+                                        ],
                                       ),
-                                      IconButton(
-                                        icon: const Icon(Icons.delete),
-                                        onPressed: () {
-                                          _firestore
-                                              .collection('tasks')
-                                              .doc(task.id)
-                                              .delete();
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
+                                    ),
+                                  ));
                             },
                           ),
                         ),
@@ -147,66 +153,69 @@ class _HomeScreenState extends State<HomeScreen> {
           builder: (context, setState) {
             return AlertDialog(
               title: const Text('Add New Task'),
-              content: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextFormField(
-                      decoration: const InputDecoration(labelText: 'Title'),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter a title';
-                        }
-                        return null;
-                      },
-                      onSaved: (value) {
-                        title = value!;
-                      },
-                    ),
-                    TextFormField(
-                      decoration:
-                          const InputDecoration(labelText: 'Description'),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter a description';
-                        }
-                        return null;
-                      },
-                      onSaved: (value) {
-                        description = value!;
-                      },
-                    ),
-                    TextFormField(
-                      decoration: const InputDecoration(
-                          labelText: 'Due Date (yyyy/mm/dd)'),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter a due date';
-                        }
-                        if (!RegExp(r'^\d{4}/\d{2}/\d{2}$').hasMatch(value)) {
-                          return 'Please enter a valid date (yyyy/mm/dd)';
-                        }
-                        return null;
-                      },
-                      onSaved: (value) {
-                        dueDate = value!;
-                      },
-                    ),
-                    Row(
-                      children: [
-                        Checkbox(
-                          value: isPriority,
-                          onChanged: (value) {
-                            setState(() {
-                              isPriority = value!;
-                            });
-                          },
-                        ),
-                        const Text('Set as Priority'),
-                      ],
-                    ),
-                  ],
+              content: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.95,
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextFormField(
+                        decoration: const InputDecoration(labelText: 'Title'),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter a title';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          title = value!;
+                        },
+                      ),
+                      TextFormField(
+                        decoration:
+                            const InputDecoration(labelText: 'Description'),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter a description';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          description = value!;
+                        },
+                      ),
+                      TextFormField(
+                        decoration: const InputDecoration(
+                            labelText: 'Due Date (yyyy/mm/dd)'),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter a due date';
+                          }
+                          if (!RegExp(r'^\d{4}/\d{2}/\d{2}$').hasMatch(value)) {
+                            return 'Please enter a valid date (yyyy/mm/dd)';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          dueDate = value!;
+                        },
+                      ),
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: isPriority,
+                            onChanged: (value) {
+                              setState(() {
+                                isPriority = value!;
+                              });
+                            },
+                          ),
+                          const Text('Set as Priority'),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
               actions: [

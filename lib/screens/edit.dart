@@ -7,7 +7,7 @@ class EditTaskScreen extends StatefulWidget {
 
   const EditTaskScreen({
     Key? key,
-    required this.taskData, 
+    required this.taskData,
     required this.taskId,
     required this.onSave,
   }) : super(key: key);
@@ -97,23 +97,38 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                 },
               ),
               const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    _formKey.currentState!.save();
-                    widget.onSave(
-                      {
-                        'title': title,
-                        'description': description,
-                        'dueDate': dueDate,
-                        'priority': isPriority,
-                      },
-                      widget.taskId
-                  );
-                    Navigator.of(context).pop();
-                  }
-                },
-                child: const Text('Save'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        _formKey.currentState!.save();
+                        widget.onSave(
+                          {
+                            'title': title,
+                            'description': description,
+                            'dueDate': dueDate,
+                            'priority': isPriority,
+                          },
+                          widget.taskId,
+                        );
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    child: const Text('Save'),
+                  ),
+                  const SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey,
+                    ),
+                    child: const Text('Cancel', style: TextStyle(color: Colors.white)),
+                  ),
+                ],
               ),
             ],
           ),
